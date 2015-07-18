@@ -178,10 +178,11 @@ impl WebSocketClient {
     }
 }
 
+use std::str::FromStr;
 
 fn main() {
     let server_socket = TcpSocket::v4().unwrap();
-    let address = std::str::FromStr::from_str("0.0.0.0:10000").unwrap();
+    let address = FromStr::from_str("0.0.0.0:10000").unwrap();
     server_socket.bind(&address).unwrap();
     let server_socket = server_socket.listen(128).unwrap();
 
@@ -193,5 +194,9 @@ fn main() {
         socket: server_socket    // Handling the ownership of the socket to the struct
     };
 
+    event_loop.register_opt(&server.socket,
+                           SERVER_TOKEN,
+                           EventSet::readable(),
+                           PollOpt::edge()).unwrap();
     event_loop.run(&mut server).unwrap();
 }
